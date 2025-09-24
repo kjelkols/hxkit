@@ -139,8 +139,8 @@ def main():
             pressure=hot_air.pressure,
             relative_humidity=hot_air.relative_humidity,
             humidity_ratio=hot_air.humidity_ratio,
-            dew_point=0.0,  # TODO: Beregn duggpunkt
-            wet_bulb_temperature=hot_air.wet_bulb_temperature,
+            dew_point=hot_air.dew_point,
+            wet_bulb=hot_air.wet_bulb,
             density=hot_air.density,
             enthalpy=hot_air.enthalpy
         )
@@ -150,8 +150,8 @@ def main():
             pressure=cold_air.pressure,
             relative_humidity=cold_air.relative_humidity,
             humidity_ratio=cold_air.humidity_ratio,
-            dew_point=0.0,  # TODO: Beregn duggpunkt
-            wet_bulb_temperature=cold_air.wet_bulb_temperature,
+            dew_point=cold_air.dew_point,
+            wet_bulb=cold_air.wet_bulb,
             density=cold_air.density,
             enthalpy=cold_air.enthalpy
         )
@@ -161,8 +161,8 @@ def main():
             pressure=results["hot_outlet"].pressure,
             relative_humidity=results["hot_outlet"].relative_humidity,
             humidity_ratio=results["hot_outlet"].humidity_ratio,
-            dew_point=0.0,  # TODO: Beregn duggpunkt
-            wet_bulb_temperature=results["hot_outlet"].wet_bulb_temperature,
+            dew_point=results["hot_outlet"].dew_point,
+            wet_bulb=results["hot_outlet"].wet_bulb,
             density=results["hot_outlet"].density,
             enthalpy=results["hot_outlet"].enthalpy
         )
@@ -172,8 +172,8 @@ def main():
             pressure=results["cold_outlet"].pressure,
             relative_humidity=results["cold_outlet"].relative_humidity,
             humidity_ratio=results["cold_outlet"].humidity_ratio,
-            dew_point=0.0,  # TODO: Beregn duggpunkt
-            wet_bulb_temperature=results["cold_outlet"].wet_bulb_temperature,
+            dew_point=results["cold_outlet"].dew_point,
+            wet_bulb=results["cold_outlet"].wet_bulb,
             density=results["cold_outlet"].density,
             enthalpy=results["cold_outlet"].enthalpy
         )

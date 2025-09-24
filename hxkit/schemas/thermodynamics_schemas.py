@@ -21,7 +21,7 @@ class MoistAirInput(BaseModel):
     relative_humidity: Optional[float] = Field(None, description="Relativ fuktighet [%]", ge=0, le=100)
     humidity_ratio: Optional[float] = Field(None, description="Fuktighetsforhold [kg/kg]", ge=0)
     dew_point: Optional[float] = Field(None, description="Duggpunkt [°C]")
-    wet_bulb: Optional[float] = Field(None, description="Våtbulbtemperatur [°C]")
+    wet_bulb: Optional[float] = Field(None, description="Våtkuletemperatur [°C]")
 
     @model_validator(mode='after')
     def validate_humidity_inputs(self):
@@ -43,14 +43,15 @@ class MoistAirOutput(BaseModel):
     relative_humidity: float = Field(..., description="Relativ fuktighet [%]")
     humidity_ratio: float = Field(..., description="Fuktighetsforhold [kg/kg]")
     dew_point: float = Field(..., description="Duggpunkt [°C]")
-    wet_bulb_temperature: float = Field(..., description="Våtbulbtemperatur [°C]")
+    wet_bulb: float = Field(..., description="Våtkuletemperatur [°C]")
     density: float = Field(..., description="Tetthet [kg/m³]")
+    specific_volume: float = Field(..., description="Spesifikt volum [m³/kg]")
     enthalpy: float = Field(..., description="Entalpi [kJ/kg]")
 
 
 class PsychrometricConditions(BaseModel):
     """Schema for psykrometriske forhold."""
-    
+
     hot_side: MoistAirInput = Field(..., description="Varm side innløp")
     cold_side: MoistAirInput = Field(..., description="Kald side innløp")
 

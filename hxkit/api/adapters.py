@@ -50,7 +50,7 @@ class ThermodynamicsAdapter:
         elif schema.dew_point is not None:
             kwargs["dew_point"] = schema.dew_point
         elif schema.wet_bulb is not None:
-            kwargs["wet_bulb_temperature"] = schema.wet_bulb
+            kwargs["wet_bulb"] = schema.wet_bulb
             
         return MoistAir(**kwargs)
     
@@ -70,9 +70,10 @@ class ThermodynamicsAdapter:
             pressure=air.pressure,
             relative_humidity=air.relative_humidity,
             humidity_ratio=air.humidity_ratio,
-            dew_point=0.0,  # TODO: Implementer duggpunkt beregning
-            wet_bulb_temperature=air.wet_bulb_temperature,
+            dew_point=air.dew_point,
+            wet_bulb=air.wet_bulb,
             density=air.density,
+            specific_volume=air.specific_volume,
             enthalpy=air.enthalpy
         )
 
