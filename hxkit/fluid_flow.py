@@ -9,7 +9,10 @@ Dette modulet inneholder klasser og funksjoner for:
 
 import numpy as np
 from typing import Union, Tuple, Optional
-from .thermodynamics import MoistAir
+# Import MoistAir dynamisk for å unngå sirkulær import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .thermodynamics import MoistAir
 
 
 class FlowCalculator:
@@ -17,7 +20,7 @@ class FlowCalculator:
     Klasse for strømningsberegninger i varmevekslere.
     """
     
-    def __init__(self, fluid: MoistAir):
+    def __init__(self, fluid):
         """
         Initialiserer strømningskalkulator for et gitt fluid.
         

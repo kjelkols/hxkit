@@ -82,7 +82,7 @@ def create_simple_psychrometric_chart():
                         fontsize=9, ha='left')
     
     # Formatering
-    plt.xlabel('Tørrbulb Temperatur (°C)', fontsize=14, fontweight='bold')
+    plt.xlabel('tørrkule Temperatur (°C)', fontsize=14, fontweight='bold')
     plt.ylabel('Fuktighetsforhold (g/kg tørr luft)', fontsize=14, fontweight='bold')
     plt.title('Psykrometrisk Diagram\n(Atmosfærisk trykk: 101325 Pa)', fontsize=16, fontweight='bold')
     plt.grid(True, alpha=0.3, linestyle='--')

@@ -7,7 +7,10 @@ som kombinerer termodynamikk, strømning og varmeoverføring.
 
 import numpy as np
 from typing import Union, Tuple, Optional, Dict
-from .thermodynamics import MoistAir, Psychrometrics
+# Import MoistAir og Psychrometrics dynamisk for å unngå sirkulær import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .thermodynamics import MoistAir, Psychrometrics
 from .fluid_flow import FlowCalculator, MassFlowDistribution
 from .heat_transfer import HeatTransferCoefficients, EffectivenessNTU
 from .geometries import PlateGeometry, HeatExchangerCore
@@ -36,7 +39,7 @@ class PlateHeatExchanger:
         self.wall_conductivity = wall_conductivity
         self.effectiveness_ntu = EffectivenessNTU()
     
-    def analyze(self, hot_inlet: MoistAir, cold_inlet: MoistAir,
+    def analyze(self, hot_inlet, cold_inlet,
                 hot_mass_flow: float, cold_mass_flow: float) -> Dict:
         """
         Utfører fullstendig analyse av varmeveksleren.
@@ -84,6 +87,11 @@ class PlateHeatExchanger:
         
         # Lag utløpstilstander (antatt sensibel varmeoverføring)
         hot_outlet = Psychrometrics.sensible_cooling(hot_inlet, hot_outlet_temp)
+        # Lazy import av MoistAir
+        import importlib
+        hxkit = importlib.import_module('hxkit')
+        MoistAir = hxkit.MoistAir
+        
         cold_outlet = MoistAir(temperature=cold_outlet_temp, 
                               humidity_ratio=cold_inlet.humidity_ratio,
                               pressure=cold_inlet.pressure)
@@ -107,7 +115,7 @@ class PlateHeatExchanger:
             "cold_htc": cold_htc,
         }
     
-    def _calculate_velocity(self, mass_flow: float, fluid: MoistAir, side: str) -> float:
+    def _calculate_velocity(self, mass_flow: float, fluid, side: str) -> float:
         """Beregner hastighet basert på massestrøm og geometri."""
         if side == "hot":
             flow_area = self.core.hot_side_flow_area
@@ -116,7 +124,7 @@ class PlateHeatExchanger:
         
         return mass_flow / (fluid.density * flow_area)
     
-    def _heat_transfer_coefficient(self, fluid: MoistAir, velocity: float) -> float:
+    def _heat_transfer_coefficient(self, fluid, velocity: float) -> float:
         """Beregner varmeoverføringskoeffisient."""
         htc_calc = HeatTransferCoefficients(fluid)
         return htc_calc.heat_transfer_coefficient(velocity, self.core.plate_geometry)
@@ -126,12 +134,12 @@ class PlateHeatExchanger:
         wall_resistance = self.wall_thickness / self.wall_conductivity
         return 1 / (1/h_hot + wall_resistance + 1/h_cold)
     
-    def _pressure_drop(self, fluid: MoistAir, velocity: float, side: str) -> float:
+    def _pressure_drop(self, fluid, velocity: float, side: str) -> float:
         """Beregner trykkfall."""
         flow_calc = FlowCalculator(fluid)
         return flow_calc.pressure_drop_plate(velocity, self.core.plate_geometry)
     
-    def performance_map(self, hot_inlet: MoistAir, cold_inlet: MoistAir,
+    def performance_map(self, hot_inlet, cold_inlet,
                        mass_flow_range: Tuple[float, float], 
                        n_points: int = 20) -> Dict:
         """
@@ -169,7 +177,7 @@ class PlateHeatExchanger:
         
         return results
     
-    def optimize_geometry(self, hot_inlet: MoistAir, cold_inlet: MoistAir,
+    def optimize_geometry(self, hot_inlet, cold_inlet,
                          hot_mass_flow: float, cold_mass_flow: float,
                          target_effectiveness: float = 0.8) -> HeatExchangerCore:
         """

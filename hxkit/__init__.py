@@ -1,5 +1,5 @@
 """
-HXKit - Et bibliotek for å bygge varmevekslermodeller
+HXKit - Et bibliotek for å bygge varmevekslere
 ==================================================
 
 Dette biblioteket inneholder byggesteiner for termodynamikk og strømningsberegninger
@@ -13,10 +13,10 @@ Hovedmoduler:
 - geometries: Geometriske beskrivelser av varmevekslere
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "Kjell Kolsaker"
 
-# Import av hovedklasser for enkel tilgang
+# Enkle, direkte imports
 from .thermodynamics import MoistAir, Psychrometrics
 from .fluid_flow import FlowCalculator
 from .heat_transfer import HeatTransferCoefficients

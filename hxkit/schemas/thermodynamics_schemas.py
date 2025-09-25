@@ -14,8 +14,11 @@ class HumidityInputType(str, Enum):
 class MoistAirInput(BaseModel):
     """Input schema for fuktig luft tilstand."""
     
-    temperature: float = Field(..., description="Tørrbulbtemperatur [°C]", ge=-50, le=100)
+    temperature: float = Field(..., description="tørrkuletemperatur [°C]", ge=-50, le=100)
     pressure: float = Field(101325, description="Trykk [Pa]", gt=0)
+    
+    # Termodynamisk engine (valgfri)
+    engine: Optional[str] = Field(None, description="Termodynamisk engine ('ASHRAE' eller 'CoolProp')")
     
     # En av disse må være oppgitt
     relative_humidity: Optional[float] = Field(None, description="Relativ fuktighet [%]", ge=0, le=100)
@@ -38,7 +41,7 @@ class MoistAirInput(BaseModel):
 class MoistAirOutput(BaseModel):
     """Output schema for fuktig luft tilstand."""
     
-    temperature: float = Field(..., description="Tørrbulbtemperatur [°C]")
+    temperature: float = Field(..., description="Tørrkuletemperatur [°C]")
     pressure: float = Field(..., description="Trykk [Pa]")
     relative_humidity: float = Field(..., description="Relativ fuktighet [%]")
     humidity_ratio: float = Field(..., description="Fuktighetsforhold [kg/kg]")

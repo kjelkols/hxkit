@@ -7,11 +7,16 @@ Adapters fungerer som et "oversettelsslag" mellom:
 
 Dette gjør det enkelt å bygge web-APIer, konfigurasjonsverktøy, og andre 
 grensesnitt oppå hxkit kjernefunksjonaliteten.
+
+Med den forenklede arkitekturen kan adapters nå bruke normale Python imports
+uten komplekse lazy loading mekanismer.
 """
 
-from typing import Dict, Any
-from ..thermodynamics import MoistAir
+from typing import Dict, Any, TYPE_CHECKING
 from ..geometries import PlateGeometry, HeatExchangerCore
+
+# Enkle direkte imports
+from ..thermodynamics import MoistAir
 from ..plate_heat_exchanger import PlateHeatExchanger
 from ..schemas.thermodynamics_schemas import (
     MoistAirInput, MoistAirOutput, PsychrometricConditions, FlowConditions,
@@ -27,7 +32,7 @@ class ThermodynamicsAdapter:
     """
     
     @staticmethod
-    def from_schema(schema: MoistAirInput) -> MoistAir:
+    def from_schema(schema: MoistAirInput):
         """
         Konverterer MoistAirInput schema til MoistAir objekt.
         
@@ -42,6 +47,10 @@ class ThermodynamicsAdapter:
             "pressure": schema.pressure
         }
         
+        # Legg til engine hvis spesifisert
+        if schema.engine is not None:
+            kwargs["engine"] = schema.engine
+        
         # Bestem hvilken fuktighetsparameter som er oppgitt
         if schema.relative_humidity is not None:
             kwargs["relative_humidity"] = schema.relative_humidity
@@ -55,7 +64,7 @@ class ThermodynamicsAdapter:
         return MoistAir(**kwargs)
     
     @staticmethod
-    def to_schema(air: MoistAir) -> MoistAirOutput:
+    def to_schema(air) -> MoistAirOutput:
         """
         Konverterer MoistAir objekt til MoistAirOutput schema.
         

@@ -4,7 +4,7 @@ Tester for termodynamikk modulen.
 
 import pytest
 import numpy as np
-from hxkit.thermodynamics import MoistAir, Psychrometrics
+from hxkit import MoistAir, Psychrometrics
 
 
 class TestMoistAir:

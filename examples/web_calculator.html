@@ -280,6 +280,24 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Termodynamisk Engine:</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="ashrae-engine" name="engineType" value="ASHRAE" checked>
+                                <label for="ashrae-engine">ASHRAE (Standard)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="coolprop-engine" name="engineType" value="CoolProp">
+                                <label for="coolprop-engine">CoolProp (Høy presisjon)</label>
+                            </div>
+                        </div>
+                        <small style="color: #666; font-size: 0.85em; margin-top: 5px; display: block;">
+                            💡 <strong>ASHRAE:</strong> Rask, standard nøyaktighet for vanlige forhold<br>
+                            💡 <strong>CoolProp:</strong> Høyere presisjon, krever CoolProp-biblioteket
+                        </small>
+                    </div>
+
+                    <div class="form-group">
                         <label>Fuktighet Parameter:</label>
                         <div class="radio-group">
                             <div class="radio-option">
@@ -296,7 +314,7 @@
                             </div>
                             <div class="radio-option">
                                 <input type="radio" id="wb" name="humidityType" value="wet_bulb">
-                                <label for="wb">Våtkulb (°C)</label>
+                                <label for="wb">Våtkule (°C)</label>
                             </div>
                         </div>
                     </div>
@@ -418,7 +436,7 @@
                         humidityValue.step = '0.1';
                         break;
                     case 'wet_bulb':
-                        humidityLabel.textContent = 'Våtkulb (°C):';
+                        humidityLabel.textContent = 'Våtkule (°C):';
                         humidityValue.value = '20.0';
                         humidityValue.step = '0.1';
                         break;
@@ -439,6 +457,7 @@
                 // Hent form data
                 const temperature = parseFloat(document.getElementById('temperature').value);
                 const pressure = parseFloat(document.getElementById('pressure').value);
+                const engineType = document.querySelector('input[name="engineType"]:checked').value;
                 const humidityType = document.querySelector('input[name="humidityType"]:checked').value;
                 const humidityValue = parseFloat(document.getElementById('humidityValue').value);
                 
@@ -446,6 +465,7 @@
                 const data = {
                     temperature: temperature,
                     pressure: pressure,
+                    engine: engineType,
                     relative_humidity: null,
                     humidity_ratio: null,
                     dew_point: null,
@@ -485,20 +505,25 @@
             document.getElementById('result-dewpoint').textContent = result.dew_point.toFixed(1);
             document.getElementById('result-enthalpy').textContent = result.enthalpy.toFixed(0);
             
+            // Hent valgt engine for visning
+            const engineType = document.querySelector('input[name="engineType"]:checked').value;
+            const engineDisplayName = engineType === 'CoolProp' ? 'CoolProp (Høy presisjon)' : 'ASHRAE (Standard)';
+            
             // Oppdater detaljert tabell
             const tableBody = document.getElementById('detailed-table');
             tableBody.innerHTML = '';
             
             const properties = [
-                ['Temperatur', result.temperature.toFixed(2), '°C'],
-                ['Trykk', result.pressure.toFixed(0), 'Pa'],
-                ['Relativ fuktighet', result.relative_humidity.toFixed(2), '%'],
-                ['Fuktighetsforhold', result.humidity_ratio.toFixed(6), 'kg/kg'],
-                ['Doggpunkt', result.dew_point.toFixed(2), '°C'],
-                ['Våtkuletemperatur', result.wet_bulb.toFixed(2), '°C'],
-                ['Entalpi', result.enthalpy.toFixed(0), 'J/kg'],
-                ['Tetthet', result.density.toFixed(4), 'kg/m³'],
-                ['Spesifikt volum', result.specific_volume.toFixed(4), 'm³/kg']
+                ['🔧 Beregningsengine', engineDisplayName, ''],
+                ['🌡️ Temperatur', result.temperature.toFixed(2), '°C'],
+                ['📊 Trykk', result.pressure.toFixed(0), 'Pa'],
+                ['💧 Relativ fuktighet', result.relative_humidity.toFixed(2), '%'],
+                ['⚖️ Fuktighetsforhold', result.humidity_ratio.toFixed(6), 'kg/kg'],
+                ['🌀 Doggpunkt', result.dew_point.toFixed(2), '°C'],
+                ['💨 Våtkuletemperatur', result.wet_bulb.toFixed(2), '°C'],
+                ['🔥 Entalpi', result.enthalpy.toFixed(0), 'J/kg'],
+                ['⚡ Tetthet', result.density.toFixed(4), 'kg/m³'],
+                ['📐 Spesifikt volum', result.specific_volume.toFixed(4), 'm³/kg']
             ];
             
             properties.forEach(([param, value, unit]) => {

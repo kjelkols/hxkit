@@ -8,13 +8,20 @@ HXKit inneholder byggesteiner for termodynamikk og strømningsberegninger som ka
 
 ## Hovedfunksjoner
 
-- **Termodynamikk**: Psykrometriske beregninger for fuktig luft
+- **Termodynamikk**: Psykrometriske beregninger for fuktig luft med modulær engine-støtte
 - **Strømningsberegninger**: Trykkfall og massestrømfordelinger
 - **Varmeoverføring**: Varmeoverføringskoeffisienter og effectiveness-NTU metoden
 - **Plategeometrier**: Beskrivelse av platevarmevekslergeometri
 - **Komplett analyse**: Integrert analyse av platevarmevekslere
+- **Modulære engines**: Støtte for CoolProp, RefProp og andre termodynamiske biblioteker
 
 ## Installasjon
+
+### Standard installasjon
+
+```bash
+pip install hxkit
+```
 
 ### Fra kildekode (utviklingsmodus)
 
@@ -24,10 +31,17 @@ cd hxkit
 pip install -e .
 ```
 
-### Fra PyPI (når publisert)
+### Med ekstrafunksjoner
 
 ```bash
-pip install hxkit
+# For utvikling
+pip install hxkit[dev]
+
+# For plotting
+pip install hxkit[plotting]
+
+# For web-applikasjoner  
+pip install hxkit[web]
 ```
 
 ## Rask start
@@ -79,11 +93,43 @@ print(f"Utløpstemperaturer: {results['hot_outlet'].temperature:.1f}°C / {resul
 ### `hxkit.plate_heat_exchanger`
 - `PlateHeatExchanger`: Hovedklasse som kombinerer alle komponenter
 
+## Termodynamiske Engines
+
+HXKit støtter forskjellige termodynamiske engines for økt nøyaktighet:
+
+### Standard bruk (ASHRAE-basert)
+```python
+# Standard ASHRAE-beregninger (rask og nøyaktig for vanlige forhold)
+air = MoistAir(temperature=25.0, relative_humidity=50.0)
+
+# Eksplisitt ASHRAE engine (identisk med standard)
+air = MoistAir(temperature=25.0, relative_humidity=50.0, engine="ASHRAE")
+```
+
+### CoolProp engine for høy nøyaktighet
+```python
+# CoolProp engine (krever: pip install CoolProp)
+air = MoistAir(temperature=25.0, relative_humidity=50.0, engine="CoolProp")
+
+# Hvis CoolProp ikke er installert, faller systemet automatisk 
+# tilbake til ASHRAE med en advarsel
+```
+
+### Tilgjengelige Engines
+- **"ASHRAE"**: Standard ASHRAE-baserte beregninger (alltid tilgjengelig)
+- **"CoolProp"**: Høy-presisjon CoolProp-beregninger (krever CoolProp installasjon)
+
+Ukjente engine-navn vil gi advarsel og bruke ASHRAE som fallback.
+
 ## Eksempler
 
 Se `examples/` mappen for detaljerte eksempler:
 
-- `basic_example.py`: Grunnleggende bruk av biblioteket
+- `basic_example.py`: Grunnleggende bruk av biblioteket  
+- `simple_psychrometric.py`: Enkle psykrometriske beregninger
+- `performance_test.py`: Ytelsestesting av beregninger
+- `fastapi_server.py`: Web API server med FastAPI
+- `streamlit_app.py`: Interaktiv web-app med Streamlit
 
 ## Testing
 

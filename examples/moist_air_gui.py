@@ -148,7 +148,7 @@ class MoistAirCalculator:
             ("Relativ fuktighet", "%", "relative_humidity"),
             ("Fuktighetsforhold", "kg/kg", "humidity_ratio"),
             ("Doggpunkt", "°C", "dew_point"),
-            ("Våtkulbetemperatur", "°C", "wet_bulb"),
+            ("Våtkuletemperatur", "°C", "wet_bulb"),
             ("Entalpi", "J/kg", "enthalpy"),
             ("Tetthet", "kg/m³", "density"),
             ("Spesifikt volum", "m³/kg", "specific_volume")

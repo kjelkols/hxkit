@@ -64,7 +64,7 @@ def generate_constant_rh_lines(temp_range: np.ndarray, rh_values: List[float], p
     return rh_lines
 
 def generate_constant_wb_lines(temp_range: np.ndarray, wb_values: List[float], pressure: float = 101325):
-    """Generer konstant våtkulb temperatur linjer"""
+    """Generer konstant våtkuletemperatur linjer"""
     wb_lines = {}
     
     for wb in wb_values:
@@ -72,7 +72,7 @@ def generate_constant_wb_lines(temp_range: np.ndarray, wb_values: List[float], p
         temps = []
         
         for temp in temp_range:
-            if temp > wb:  # Våtkulb kan ikke være høyere enn tørrkulb
+            if temp > wb:  # Våtkuletemperatur kan ikke være høyere enn tørrkuletemperatur
                 result = get_air_properties(temperature=temp, pressure=pressure, wet_bulb=wb)
                 if result:
                     hr_values.append(result['humidity_ratio'] * 1000)
@@ -111,8 +111,8 @@ def create_psychrometric_chart(save_filename: str = None, show_plot: bool = True
         plt.plot(data['temperatures'], data['humidity_ratios'], 
                 color=colors[i], linewidth=2, label=f'{rh}% RH')
     
-    # Generer konstant våtkulb linjer
-    print("🔄 Genererer konstant våtkulb linjer...")
+    # Generer konstant våtkule linjer
+    print("🔄 Genererer konstant våtkule linjer...")
     wb_values = [5, 10, 15, 20, 25, 30, 35, 40]
     wb_lines = generate_constant_wb_lines(temp_range, wb_values)
     
@@ -130,7 +130,7 @@ def create_psychrometric_chart(save_filename: str = None, show_plot: bool = True
                 'k-', linewidth=3, label='Metningslinje (100% RH)')
     
     # Formatering
-    plt.xlabel('Tørrbulb Temperatur (°C)', fontsize=12, fontweight='bold')
+    plt.xlabel('Tørrkuletemperatur (°C)', fontsize=12, fontweight='bold')
     plt.ylabel('Fuktighetsforhold (g/kg tørr luft)', fontsize=12, fontweight='bold')
     plt.title('Psykrometrisk Diagram\n(Trykk: 101325 Pa)', fontsize=16, fontweight='bold')
     plt.grid(True, alpha=0.3)
