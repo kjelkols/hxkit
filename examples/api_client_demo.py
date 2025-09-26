@@ -48,7 +48,9 @@ class HXKitAPIClient:
         
         return response.json()
     
-    def batch_analyze(self, cases: list, case_names: list = None) -> Dict[str, Any]:
+    from typing import Optional
+
+    def batch_analyze(self, cases: list, case_names: Optional[list] = None) -> Dict[str, Any]:
         """Batch analyse av flere cases"""
         url = f"{self.base_url}/api/v1/batch-analyze"
         

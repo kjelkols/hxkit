@@ -1,21 +1,20 @@
 """
-Demo av det nye modulære engine-systemet i HXKit.
+Demo av termodynamiske beregninger i HXKit.
 
-Viser hvordan man kan bruke forskjellige termodynamiske engines
+Viser hvordan man kan bruke forskjellige engines (ASHRAE/CoolProp)
 for psykrometriske beregninger.
 """
 
-from hxkit import MoistAir
-from hxkit.thermodynamics.registry import EngineRegistry
-from hxkit.thermodynamics.engines import ASHRAEEngine
+from hxkit import MoistAir, Psychrometrics
+import time
 
 def demo_basic_usage():
-    """Demonstrerer grunnleggende bruk av MoistAir med og uten engines."""
+    """Demonstrerer grunnleggende bruk av MoistAir."""
     print("=== GRUNNLEGGENDE BRUK ===")
     
-    # Standard bruk (ingen engine spesifisert)
+    # Standard bruk med ASHRAE-implementasjon
     air1 = MoistAir(temperature=25.0, relative_humidity=50.0)
-    print(f"Standard MoistAir:")
+    print(f"MoistAir (ASHRAE):")
     print(f"  Temperatur: {air1.temperature:.1f}°C")
     print(f"  Relativ fuktighet: {air1.relative_humidity:.1f}%")
     print(f"  Fuktighetsforhold: {air1.humidity_ratio:.6f} kg/kg")
@@ -25,149 +24,175 @@ def demo_basic_usage():
     print(f"  Tetthet: {air1.density:.3f} kg/m³")
     print()
 
-def demo_engine_registry():
-    """Demonstrerer bruk av engine registry."""
-    print("=== ENGINE REGISTRY ===")
+def demo_different_input_methods():
+    """Demonstrerer forskjellige måter å spesifisere fuktighet."""
+    print("=== FORSKJELLIGE INPUT-METODER ===")
     
-    # Opprett registry
-    registry = EngineRegistry()
+    temp = 20.0
+    pressure = 101325.0
     
-    # List tilgjengelige engines
-    available = registry.list_available()
-    print("Tilgjengelige engines:")
-    for name, description in available.items():
-        status = "✓" if "ikke tilgjengelig" not in description.lower() else "✗"
-        print(f"  {status} {name}: {description}")
+    # Relativ fuktighet
+    air1 = MoistAir(temperature=temp, relative_humidity=60.0, pressure=pressure)
+    print(f"Fra relativ fuktighet (60%):")
+    print(f"  Fuktighetsforhold: {air1.humidity_ratio:.6f} kg/kg")
+    print(f"  Duggpunkt: {air1.dew_point:.1f}°C")
+    print(f"  Våtkule: {air1.wet_bulb:.1f}°C")
     print()
     
-    # Bruk ASHRAE engine via registry
-    engine = registry.get_engine("ashrae")
+    # Fuktighetsforhold
+    air2 = MoistAir(temperature=temp, humidity_ratio=0.008, pressure=pressure)
+    print(f"Fra fuktighetsforhold (0.008 kg/kg):")
+    print(f"  Relativ fuktighet: {air2.relative_humidity:.1f}%")
+    print(f"  Duggpunkt: {air2.dew_point:.1f}°C")
+    print(f"  Våtkule: {air2.wet_bulb:.1f}°C")
+    print()
+    
+    # Duggpunkt
+    air3 = MoistAir(temperature=temp, dew_point=10.0, pressure=pressure)
+    print(f"Fra duggpunkt (10°C):")
+    print(f"  Relativ fuktighet: {air3.relative_humidity:.1f}%")
+    print(f"  Fuktighetsforhold: {air3.humidity_ratio:.6f} kg/kg")
+    print(f"  Våtkule: {air3.wet_bulb:.1f}°C")
+    print()
+    
+    # Våtkule
+    air4 = MoistAir(temperature=temp, wet_bulb=15.0, pressure=pressure)
+    print(f"Fra våtkule (15°C):")
+    print(f"  Relativ fuktighet: {air4.relative_humidity:.1f}%")
+    print(f"  Fuktighetsforhold: {air4.humidity_ratio:.6f} kg/kg")
+    print(f"  Duggpunkt: {air4.dew_point:.1f}°C")
+    print()
+
+def demo_engine_selection():
+    """Demonstrerer valg av termodynamisk engine."""
+    print("=== ENGINE-VALG ===")
+    
+    temp, rh = 25.0, 50.0
+    
+    # ASHRAE engine (standard)
+    air_ashrae = MoistAir(temperature=temp, relative_humidity=rh, engine="ASHRAE")
     print(f"ASHRAE Engine:")
-    print(f"  Navn: {engine.name}")
-    print(f"  Beskrivelse: {engine.description}")
-    print(f"  Temperaturområde: {engine.valid_temperature_range[0]:.0f} til {engine.valid_temperature_range[1]:.0f}°C")
-    print(f"  Trykkområde: {engine.valid_pressure_range[0]/1000:.0f} til {engine.valid_pressure_range[1]/1000:.0f} kPa")
+    print(f"  Fuktighetsforhold: {air_ashrae.humidity_ratio:.6f} kg/kg")
+    print(f"  Våtkule: {air_ashrae.wet_bulb:.2f}°C")
+    print(f"  Entalpi: {air_ashrae.enthalpy:.1f} kJ/kg")
+    print()
+    
+    # CoolProp engine (hvis tilgjengelig)
+    try:
+        air_coolprop = MoistAir(temperature=temp, relative_humidity=rh, engine="CoolProp")
+        print(f"CoolProp Engine:")
+        print(f"  Fuktighetsforhold: {air_coolprop.humidity_ratio:.6f} kg/kg")
+        print(f"  Våtkule: {air_coolprop.wet_bulb:.2f}°C")
+        print(f"  Entalpi: {air_coolprop.enthalpy:.1f} kJ/kg")
+        
+        # Sammenlign forskjellene
+        diff_w = abs(air_ashrae.humidity_ratio - air_coolprop.humidity_ratio)
+        diff_wb = abs(air_ashrae.wet_bulb - air_coolprop.wet_bulb)
+        diff_h = abs(air_ashrae.enthalpy - air_coolprop.enthalpy)
+        
+        print(f"\nForskjeller (CoolProp - ASHRAE):")
+        print(f"  Fuktighetsforhold: {diff_w:.2e} kg/kg")
+        print(f"  Våtkule: {diff_wb:.3f}°C")
+        print(f"  Entalpi: {diff_h:.2f} kJ/kg")
+        
+    except Exception as e:
+        print(f"CoolProp Engine: Ikke tilgjengelig ({str(e)})")
+        print("  Installer med: pip install CoolProp")
     print()
 
-def demo_direct_engine_calculations():
-    """Demonstrerer direkte bruk av engine for beregninger."""
-    print("=== DIREKTE ENGINE BEREGNINGER ===")
+def demo_psychrometric_calculations():
+    """Demonstrerer bruk av Psychrometrics-klassen."""
+    print("=== PSYKROMETRISKE BEREGNINGER ===")
     
-    engine = ASHRAEEngine()
+    # Mixing av to luftstrømmer
+    air1 = MoistAir(temperature=25.0, relative_humidity=30.0)  # Tørr luft
+    air2 = MoistAir(temperature=20.0, relative_humidity=80.0)  # Fuktig luft
     
-    # Beregn egenskaper med forskjellige input
+    print(f"Luftstrøm 1: {air1.temperature:.1f}°C, {air1.relative_humidity:.1f}% RH")
+    print(f"Luftstrøm 2: {air2.temperature:.1f}°C, {air2.relative_humidity:.1f}% RH")
+    
+    # Blanding (50/50)
+    mixed = Psychrometrics.mixing_ratio(air1, 1.0, air2, 1.0)
+    print(f"Blandet luft: {mixed.temperature:.1f}°C, {mixed.relative_humidity:.1f}% RH")
+    print(f"  Fuktighetsforhold: {mixed.humidity_ratio:.6f} kg/kg")
+    print()
+    
+    # Sensibel kjøling
+    original = MoistAir(temperature=30.0, relative_humidity=40.0)
+    cooled = Psychrometrics.sensible_cooling(original, 25.0)
+    
+    print(f"Sensibel kjøling:")
+    print(f"  Før: {original.temperature:.1f}°C, {original.relative_humidity:.1f}% RH")
+    print(f"  Etter: {cooled.temperature:.1f}°C, {cooled.relative_humidity:.1f}% RH")
+    print(f"  Fuktighetsforhold uendret: {abs(original.humidity_ratio - cooled.humidity_ratio) < 1e-6}")
+    print()
+
+def demo_extreme_conditions():
+    """Demonstrerer beregninger under ekstreme forhold."""
+    print("=== EKSTREME FORHOLD ===")
+    
     test_cases = [
-        {"relative_humidity": 50.0},
-        {"humidity_ratio": 0.010},
-        {"dew_point": 15.0},
-        {"wet_bulb": 20.0}
+        ("Kaldt og tørt", -20.0, 30.0),
+        ("Varmt og fuktig", 45.0, 90.0),
+        ("Standard kontor", 22.0, 45.0),
+        ("Tropisk klima", 35.0, 80.0),
+        ("Ørken", 50.0, 10.0)
     ]
     
-    for i, humidity_input in enumerate(test_cases, 1):
-        print(f"Test {i} - Input: {humidity_input}")
-        
+    print(f"{'Tilstand':<15} {'Temp':<6} {'RH':<4} {'Våtkule':<8} {'Entalpi':<8} {'Tetthet':<8}")
+    print("-" * 65)
+    
+    for name, temp, rh in test_cases:
         try:
-            properties = engine.calculate_properties(25.0, 101325.0, humidity_input)
-            print(f"  Fuktighetsforhold: {properties['humidity_ratio']:.6f} kg/kg")
-            print(f"  Relativ fuktighet: {properties['relative_humidity']:.1f}%")
-            print(f"  Duggpunkt: {properties['dew_point']:.1f}°C")
-            print(f"  våtkule: {properties['wet_bulb']:.1f}°C")
-            print(f"  Entalpi: {properties['enthalpy']:.1f} kJ/kg")
+            air = MoistAir(temperature=temp, relative_humidity=rh)
+            print(f"{name:<15} {temp:<6.1f} {rh:<4.0f} {air.wet_bulb:<8.1f} {air.enthalpy:<8.1f} {air.density:<8.3f}")
         except Exception as e:
-            print(f"  Feil: {e}")
-        print()
-
-def demo_moistair_with_engines():
-    """Demonstrerer MoistAir med forskjellige engines."""
-    print("=== MOISTAIR MED ENGINES ===")
-    
-    # Sammenlign standard vs engine
-    conditions = [
-        (20.0, 60.0),
-        (30.0, 40.0),
-        (-5.0, 80.0),
-        (50.0, 30.0)
-    ]
-    
-    print("Sammenligning Standard vs ASHRAE Engine:")
-    print(f"{'Temp':<6} {'RH':<4} {'Standard W':<12} {'Engine W':<12} {'Diff':<10}")
-    print("-" * 60)
-    
-    for temp, rh in conditions:
-        # Standard
-        air_std = MoistAir(temperature=temp, relative_humidity=rh)
-        
-        # Med ASHRAE engine
-        engine = ASHRAEEngine()
-        air_eng = MoistAir(temperature=temp, relative_humidity=rh, engine=engine)
-        
-        diff = abs(air_std.humidity_ratio - air_eng.humidity_ratio)
-        
-        print(f"{temp:<6.1f} {rh:<4.0f} {air_std.humidity_ratio:<12.6f} {air_eng.humidity_ratio:<12.6f} {diff:<10.2e}")
-
-def demo_engine_validation():
-    """Demonstrerer engine validering og advarsler."""
-    print("\n=== ENGINE VALIDERING ===")
-    
-    engine = ASHRAEEngine()
-    
-    # Test normale verdier
-    warnings = engine.validate_inputs(25.0, 101325.0, {"relative_humidity": 50.0})
-    print(f"Normale verdier - Advarsler: {len(warnings)}")
-    
-    # Test ekstreme verdier
-    warnings = engine.validate_inputs(-40.0, 50000.0, {"relative_humidity": 95.0})
-    print(f"Ekstreme verdier - Advarsler: {len(warnings)}")
-    for warning in warnings:
-        print(f"  - {warning}")
-    
-    # Test ugyldige verdier
-    try:
-        engine.validate_inputs(25.0, 101325.0, {"relative_humidity": -10.0})
-    except ValueError as e:
-        print(f"Ugyldig verdi - Feil: {e}")
+            print(f"{name:<15} {temp:<6.1f} {rh:<4.0f} {'ERROR':<24}")
+    print()
 
 def demo_performance_comparison():
-    """Demonstrerer ytelsessammenligning."""
-    print("\n=== YTELSESSAMMENLIGNING ===")
-    
-    import time
+    """Demonstrerer ytelsessammenligning av forskjellige beregninger."""
+    print("=== YTELSESTEST ===")
     
     # Test data
-    test_conditions = [(20 + i, 40 + i) for i in range(20)]
+    n_iterations = 1000
+    test_conditions = [(20 + i*0.1, 40 + i*0.2) for i in range(100)]
     
-    # Standard MoistAir
+    # Test forskjellige beregningstyper
+    print(f"Tester {n_iterations} iterasjoner med {len(test_conditions)} forskjellige tilstander...")
+    
+    # MoistAir opprettelse
     start_time = time.time()
-    for temp, rh in test_conditions:
-        air = MoistAir(temperature=temp, relative_humidity=rh)
-        _ = air.dew_point, air.wet_bulb, air.enthalpy
-    std_time = time.time() - start_time
+    for _ in range(n_iterations//100):
+        for temp, rh in test_conditions:
+            air = MoistAir(temperature=temp, relative_humidity=rh)
+    creation_time = time.time() - start_time
     
-    # Med ASHRAE engine
-    engine = ASHRAEEngine()
+    # Egenskapsberegninger
+    air = MoistAir(temperature=25.0, relative_humidity=50.0)
     start_time = time.time()
-    for temp, rh in test_conditions:
-        air = MoistAir(temperature=temp, relative_humidity=rh, engine=engine)
-        _ = air.dew_point, air.wet_bulb, air.enthalpy
-    eng_time = time.time() - start_time
+    for _ in range(n_iterations):
+        _ = air.wet_bulb, air.dew_point, air.enthalpy, air.density
+    properties_time = time.time() - start_time
     
-    print(f"Standard implementasjon: {std_time*1000:.2f} ms")
-    print(f"ASHRAE engine: {eng_time*1000:.2f} ms")
-    print(f"Forhold: {eng_time/std_time:.2f}x")
+    print(f"Opprettelse av MoistAir: {creation_time*1000:.2f} ms")
+    print(f"Egenskapsberegninger: {properties_time*1000:.2f} ms")
+    print(f"Gjennomsnitt per operasjon: {(creation_time + properties_time)/n_iterations*1000000:.2f} μs")
+    print()
 
 if __name__ == "__main__":
-    print("HXKit Modulær Engine System Demo")
+    print("HXKit Termodynamiske Beregninger Demo")
     print("=" * 50)
     
     demo_basic_usage()
-    demo_engine_registry()
-    demo_direct_engine_calculations()
-    demo_moistair_with_engines()
-    demo_engine_validation()
+    demo_different_input_methods()
+    demo_engine_selection()
+    demo_psychrometric_calculations()
+    demo_extreme_conditions()
     demo_performance_comparison()
     
     print("\nDemo fullført! 🎉")
-    print("\nTilgjengelige engines kan utvides med:")
-    print("- CoolProp engine: pip install CoolProp")
-    print("- RefProp engine: Krever NIST RefProp lisens")
-    print("- Egendefinerte engines: Implementer ThermodynamicEngine interface")
+    print("\nTilgjengelige engines:")
+    print("- ASHRAE: Standard implementasjon (alltid tilgjengelig)")
+    print("- CoolProp: Høy presisjon (pip install CoolProp)")
+    print("\nFor mer informasjon, se dokumentasjonen eller andre eksempler.")

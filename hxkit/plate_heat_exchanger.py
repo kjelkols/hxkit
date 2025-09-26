@@ -7,10 +7,7 @@ som kombinerer termodynamikk, strømning og varmeoverføring.
 
 import numpy as np
 from typing import Union, Tuple, Optional, Dict
-# Import MoistAir og Psychrometrics dynamisk for å unngå sirkulær import
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from .thermodynamics import MoistAir, Psychrometrics
+from .thermodynamics import MoistAir, Psychrometrics
 from .fluid_flow import FlowCalculator, MassFlowDistribution
 from .heat_transfer import HeatTransferCoefficients, EffectivenessNTU
 from .geometries import PlateGeometry, HeatExchangerCore
@@ -87,10 +84,6 @@ class PlateHeatExchanger:
         
         # Lag utløpstilstander (antatt sensibel varmeoverføring)
         hot_outlet = Psychrometrics.sensible_cooling(hot_inlet, hot_outlet_temp)
-        # Lazy import av MoistAir
-        import importlib
-        hxkit = importlib.import_module('hxkit')
-        MoistAir = hxkit.MoistAir
         
         cold_outlet = MoistAir(temperature=cold_outlet_temp, 
                               humidity_ratio=cold_inlet.humidity_ratio,

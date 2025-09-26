@@ -166,3 +166,7 @@ Forenklingsprosjektet var en stor suksess:
 **Biblioteket er nå rent, enkelt og proffsjonelt uten å miste funksjonalitet.**
 
 Systemet er klart for produksjonsbruk og er mye lettere å vedlikeholde og utvide videre.
+
+## Siste oppdateringer
+- **basic_example.py**: Løst runtime-feil med Psychrometrics import (linje 61)
+- **engine_system_demo.py**: Fullstendig oppdatering fra utdatert modulær til forenklet arkitektur
