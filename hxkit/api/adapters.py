@@ -13,11 +13,11 @@ uten komplekse lazy loading mekanismer.
 """
 
 from typing import Dict, Any, TYPE_CHECKING
-from ..geometries import PlateGeometry, HeatExchangerCore
+from ..heatexchangers.plate import PlateGeometry, HeatExchangerCore
 
 # Enkle direkte imports
 from ..thermodynamics import MoistAir
-from ..plate_heat_exchanger import PlateHeatExchanger
+from ..heatexchangers.plate import PlateHeatExchanger
 from ..schemas.thermodynamics_schemas import (
     MoistAirInput, MoistAirOutput, PsychrometricConditions, FlowConditions,
     PlateGeometryInput, HeatExchangerCoreInput, AnalysisInput, AnalysisOutput

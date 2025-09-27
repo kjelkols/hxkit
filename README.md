@@ -49,7 +49,7 @@ pip install hxkit[web]
 ```python
 import hxkit
 from hxkit import MoistAir, PlateHeatExchanger, HeatExchangerCore
-from hxkit.geometries import GeometryFactory
+from hxkit.heatexchangers.plate import GeometryFactory
 
 # Lag plategeometri
 plate_geom = GeometryFactory.standard_plate("medium")
@@ -85,13 +85,13 @@ print(f"Utløpstemperaturer: {results['hot_outlet'].temperature:.1f}°C / {resul
 - `HeatTransferCoefficients`: Varmeoverføringskoeffisienter og Nusselt-tall
 - `EffectivenessNTU`: Effectiveness-NTU metoden for varmeveksleranalyse
 
-### `hxkit.geometries`
-- `PlateGeometry`: Beskrivelse av platevarmevekslergeometri
-- `HeatExchangerCore`: Komplett kjernebeskrivelse
-- `GeometryFactory`: Factory for standard geometrier
+### `hxkit.heatexchangers.plate.geometry`
+- `PlateGeometry`: Beskrivelse av metal platevarmevekslergeometri
+- `HeatExchangerCore`: Komplett kjernebeskrivelse for metal plates
+- `GeometryFactory`: Factory for standard metal plate geometrier
 
-### `hxkit.plate_heat_exchanger`
-- `PlateHeatExchanger`: Hovedklasse som kombinerer alle komponenter
+### `hxkit.heatexchangers.plate.analyzer`
+- `PlateHeatExchanger`: Hovedklasse som kombinerer alle komponenter for metal plates
 
 ## Termodynamiske Engines
 
@@ -144,7 +144,7 @@ pytest tests/
 Biblioteket er designet for å være utvidbart:
 
 ### Nye geometrier
-Legg til nye geometriklasser i `geometries.py` modulen:
+Legg til nye geometriklasser i `heatexchangers/plate/geometry.py` modulen:
 
 ```python
 class TubeGeometry:

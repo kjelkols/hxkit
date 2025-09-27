@@ -9,26 +9,45 @@ Hovedmoduler:
 - thermodynamics: Termodynamiske egenskaper og beregninger
 - fluid_flow: Strømningsberegninger
 - heat_transfer: Varmeoverføringsmodeller
-- plate_heat_exchanger: Platevarmevekslermodeller
-- geometries: Geometriske beskrivelser av varmevekslere
+- heatexchangers: Varmevekslermodeller (plate og plastic_plate)
+- grid: Grid-system for numeriske beregninger
 """
 
 __version__ = "0.2.0"
 __author__ = "Kjell Kolsaker"
 
-# Enkle, direkte imports
+# Core modules
 from .thermodynamics import MoistAir, Psychrometrics
 from .fluid_flow import FlowCalculator
 from .heat_transfer import HeatTransferCoefficients
-from .plate_heat_exchanger import PlateHeatExchanger
-from .geometries import PlateGeometry, HeatExchangerCore
+from .streams import AirStream
+from .definitions import Direction
+
+# Heat exchangers - imported from new structure
+from .heatexchangers.plate import PlateHeatExchanger, PlateGeometry, HeatExchangerCore
+from .heatexchangers.plastic_plate import PlasticPlateHeatExchanger, PlasticPlateResults
+
+# Visualization functions (optional dependencies)
+try:
+    from .visualization import visualize_heat_exchanger, create_interactive_visualization
+    _VISUALIZATION_AVAILABLE = True
+except ImportError:
+    _VISUALIZATION_AVAILABLE = False
 
 __all__ = [
     "MoistAir",
-    "Psychrometrics",
-    "FlowCalculator", 
+    "Psychrometrics", 
+    "FlowCalculator",
     "HeatTransferCoefficients",
     "PlateHeatExchanger",
-    "PlateGeometry",
+    "PlateGeometry", 
     "HeatExchangerCore",
+    "PlasticPlateHeatExchanger",
+    "AirStream",
+    "Direction",
+    "PlasticPlateResults",
 ]
+
+# Add visualization functions if available
+if _VISUALIZATION_AVAILABLE:
+    __all__.extend(["visualize_heat_exchanger", "create_interactive_visualization"])

@@ -7,10 +7,10 @@ som kombinerer termodynamikk, strømning og varmeoverføring.
 
 import numpy as np
 from typing import Union, Tuple, Optional, Dict
-from .thermodynamics import MoistAir, Psychrometrics
-from .fluid_flow import FlowCalculator, MassFlowDistribution
-from .heat_transfer import HeatTransferCoefficients, EffectivenessNTU
-from .geometries import PlateGeometry, HeatExchangerCore
+from ...thermodynamics import MoistAir, Psychrometrics
+from ...fluid_flow import FlowCalculator, MassFlowDistribution
+from ...heat_transfer import HeatTransferCoefficients, EffectivenessNTU
+from .geometry import PlateGeometry, HeatExchangerCore
 
 
 class PlateHeatExchanger:

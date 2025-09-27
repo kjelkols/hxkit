@@ -4,7 +4,7 @@ Tester for plategeometri modulen.
 
 import pytest
 import numpy as np
-from hxkit.geometries import PlateGeometry, HeatExchangerCore, GeometryFactory
+from hxkit.heatexchangers.plate import PlateGeometry, HeatExchangerCore, GeometryFactory
 
 
 class TestPlateGeometry:

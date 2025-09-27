@@ -10,7 +10,7 @@ Dette eksemplet viser hvordan du kan bruke biblioteket til å:
 
 import hxkit
 from hxkit import MoistAir, PlateGeometry, PlateHeatExchanger, HeatExchangerCore
-from hxkit.geometries import GeometryFactory
+from hxkit.heatexchangers.plate import GeometryFactory
 import numpy as np
 
 
