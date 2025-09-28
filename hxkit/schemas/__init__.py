@@ -14,7 +14,24 @@ from .thermodynamics_schemas import (
     AnalysisOutput,
 )
 
+from .plastic_plate_schemas import (
+    # Input schemas
+    PlateMaterial,
+    PlateGeometryInput as PlasticPlateGeometryInput,
+    FlowDirectionInput,
+    StreamInput,
+    PlasticPlateHeatExchangerInput,
+    # Output schemas
+    StreamOutput,
+    PerformanceMetrics,
+    PhaseChangeResults,
+    GridResults,
+    ConvergenceInfo,
+    PlasticPlateHeatExchangerOutput,
+)
+
 __all__ = [
+    # Thermodynamics schemas
     "HumidityInputType",
     "MoistAirInput", 
     "MoistAirOutput",
@@ -24,4 +41,19 @@ __all__ = [
     "HeatExchangerCoreInput",
     "AnalysisInput",
     "AnalysisOutput",
+    
+    # Plastic plate heat exchanger schemas - Input
+    "PlateMaterial",
+    "PlasticPlateGeometryInput", 
+    "FlowDirectionInput",
+    "StreamInput",
+    "PlasticPlateHeatExchangerInput",
+    
+    # Plastic plate heat exchanger schemas - Output
+    "StreamOutput",
+    "PerformanceMetrics", 
+    "PhaseChangeResults",
+    "GridResults",
+    "ConvergenceInfo",
+    "PlasticPlateHeatExchangerOutput",
 ]

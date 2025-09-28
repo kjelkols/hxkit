@@ -2,38 +2,47 @@
 Enkel Psykrometrisk Diagram Generator
 ====================================
 Generer psykrometrisk diagram med matplotlib
+Bruker lokal HXKit implementasjon for beregninger
 """
 
-import requests
 import numpy as np
 import matplotlib.pyplot as plt
 
-# API konfigurasjon
-API_BASE_URL = "http://localhost:8000"
+# Lokal implementasjon
+try:
+    from hxkit.thermodynamics import MoistAir
+    LOCAL_AVAILABLE = True
+except ImportError:
+    LOCAL_AVAILABLE = False
+    print("❌ HXKit ikke tilgjengelig. Installer med: pip install -e .")
 
 def get_air_properties(temperature, relative_humidity=None, pressure=101325):
-    """Hent luftegenskaper fra API"""
-    data = {
-        "temperature": temperature,
-        "pressure": pressure,
-        "relative_humidity": relative_humidity,
-        "humidity_ratio": None,
-        "dew_point": None,
-        "wet_bulb": None
-    }
+    """Hent luftegenskaper fra lokal implementasjon"""
+    if not LOCAL_AVAILABLE:
+        return None
     
     try:
-        response = requests.post(f"{API_BASE_URL}/api/v1/air-properties", json=data, timeout=5)
-        if response.status_code == 200:
-            return response.json()
-        return None
-    except:
+        air = MoistAir(temperature=temperature, pressure=pressure, relative_humidity=relative_humidity)
+        return {
+            'temperature': air.temperature,
+            'pressure': air.pressure,
+            'relative_humidity': air.relative_humidity,
+            'humidity_ratio': air.humidity_ratio,
+            'dew_point': air.dew_point,
+            'wet_bulb': air.wet_bulb,
+            'density': air.density,
+            'specific_volume': air.specific_volume,
+            'enthalpy': air.enthalpy
+        }
+    except Exception as e:
+        print(f"⚠️  Beregning feilet for T={temperature}°C, RH={relative_humidity}%: {e}")
         return None
 
 def create_simple_psychrometric_chart():
     """Opprett enkelt psykrometrisk diagram"""
     
     print("📊 Genererer psykrometrisk diagram...")
+    print("   Bruker lokal HXKit implementasjon for beregninger...")
     
     # Temperatur område (0-50°C)
     temp_range = np.linspace(0, 50, 26)
@@ -93,7 +102,7 @@ def create_simple_psychrometric_chart():
     plt.ylim(0, 25)
     
     # Tilleggsinformasjon
-    plt.text(40, 1, 'Generert med HXKit API', fontsize=10, alpha=0.6, style='italic')
+    plt.text(40, 1, 'Generert med HXKit (lokal)', fontsize=10, alpha=0.6, style='italic')
     
     plt.tight_layout()
     
@@ -110,17 +119,14 @@ def main():
     print("🌡️ HXKit - Enkel Psykrometrisk Diagram Generator")
     print("=" * 50)
     
-    # Sjekk API tilkobling
-    try:
-        response = requests.get(f"{API_BASE_URL}/health", timeout=2)
-        if response.status_code == 200:
-            print("✅ API tilkobling OK")
-            create_simple_psychrometric_chart()
-        else:
-            print("❌ API ikke tilgjengelig")
-    except:
-        print("❌ API ikke tilgjengelig. Start serveren med:")
-        print("   python examples/fastapi_server.py")
+    if not LOCAL_AVAILABLE:
+        print("❌ HXKit ikke tilgjengelig!")
+        print("   Installer med: pip install -e .")
+        return
+    
+    print("✅ Bruker lokal HXKit implementasjon")
+    create_simple_psychrometric_chart()
+    print("\n✅ Psykrometrisk diagram generert!")
 
 if __name__ == "__main__":
     main()

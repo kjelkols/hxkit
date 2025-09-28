@@ -23,26 +23,57 @@ HXKit inneholder byggesteiner for termodynamikk og strømningsberegninger som ka
 pip install hxkit
 ```
 
-### Fra kildekode (utviklingsmodus)
+### Fra kildekode
 
 ```bash
 git clone https://github.com/kjelkols/hxkit.git
 cd hxkit
+
+# Installer i utviklingsmodus (anbefalt)
 pip install -e .
+
+# Eller installer direkte
+pip install .
 ```
 
 ### Med ekstrafunksjoner
 
 ```bash
 # For utvikling
-pip install hxkit[dev]
+pip install -e .[dev]
 
-# For plotting
-pip install hxkit[plotting]
+# For plotting-funksjoner
+pip install -e .[plotting]
 
 # For web-applikasjoner  
-pip install hxkit[web]
+pip install -e .[web]
+
+# Alle ekstrafunksjoner
+pip install -e .[dev,plotting,web]
 ```
+
+### Verifisering av installasjon
+
+Test at installasjonen fungerer:
+
+```python
+import hxkit
+print(f"HXKit versjon {hxkit.__version__}")
+
+# Test grunnleggende funksjonalitet
+from hxkit import MoistAir
+air = MoistAir(temperature=25, relative_humidity=50)
+print(f"Våtkule: {air.wet_bulb:.1f}°C")
+```
+
+### Krav
+
+- Python 3.8 eller nyere
+- numpy >= 1.20.0
+- scipy >= 1.7.0  
+- pandas >= 1.3.0
+- pydantic >= 2.0.0
+- requests >= 2.25.0
 
 ## Rask start
 

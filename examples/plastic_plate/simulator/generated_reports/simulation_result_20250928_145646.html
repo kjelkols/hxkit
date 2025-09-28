@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plastic Plate Heat Exchanger - Simuleringsresultat</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .report-header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .report-header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .report-meta {
+            display: flex;
+            gap: 30px;
+            font-size: 0.9em;
+            color: #888;
+            flex-wrap: wrap;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #34495e;
+            color: white;
+            padding: 20px 30px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .section-content {
+            padding: 30px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stream-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stream-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .stream-card.hot {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .stream-card.cold {
+            border-left: 4px solid #3498db;
+        }
+
+        .stream-header {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .temp-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .temp-indicator.hot { background: #e74c3c; }
+        .temp-indicator.cold { background: #3498db; }
+
+        .property-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .property {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .property-label {
+            color: #666;
+        }
+
+        .property-value {
+            font-weight: 600;
+        }
+
+        .plot-container {
+            margin: 20px 0;
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+        
+        .plot-container canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .plot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .plot-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .plot-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .convergence-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .stream-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .plot-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="report-header">
+            <h1>Plastic Plate Heat Exchanger - Simuleringsresultat</h1>
+            <p class="description">Resultater fra interaktiv simulator</p>
+            <div class="report-meta">
+                <span>Rapport generert: 2025-09-28 14:56:46</span>
+                <span>Analyse tidspunkt: 2025-09-28T14:56:46.694146</span>
+                <span>Solver versjon: HXKit Simulator v1.0</span>
+            </div>
+        </header>
+
+        <main>
+            
+    <section class="section">
+        <h2>Input Konfigurasjon</h2>
+        
+        <div class="grid">
+            <!-- Geometri -->
+            <div class="card">
+                <h3>Geometri</h3>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <span class="label">Platebredde</span>
+                        <span class="value">0.600 m</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Platelengde</span>
+                        <span class="value">1.200 m</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Platetykkelse</span>
+                        <span class="value">0.0010 m</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Kanalhøyde</span>
+                        <span class="value">0.0080 m</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Antall plater</span>
+                        <span class="value">20</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Platemateriale</span>
+                        <span class="value">Glass Fiber Plastic</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Strømningsretninger -->
+            <div class="card">
+                <h3>Strømningsretninger</h3>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <span class="label">Varm luft retning</span>
+                        <span class="value">SOUTH</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Kald luft retning</span>
+                        <span class="value">NORTH</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Varm strøm innløp -->
+            <div class="card">
+                <h3>Varm Strøm Innløp</h3>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <span class="label">Temperatur</span>
+                        <span class="value">35.0°C</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Trykk</span>
+                        <span class="value">101325 Pa</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Relativ fuktighet</span>
+                        <span class="value">60.0%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Massestrøm</span>
+                        <span class="value">2.50 kg/s</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Kald strøm innløp -->
+            <div class="card">
+                <h3>Kald Strøm Innløp</h3>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <span class="label">Temperatur</span>
+                        <span class="value">15.0°C</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Trykk</span>
+                        <span class="value">101325 Pa</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Relativ fuktighet</span>
+                        <span class="value">40.0%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Massestrøm</span>
+                        <span class="value">2.00 kg/s</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Numeriske parametere -->
+            <div class="card">
+                <h3>Numeriske Parametere</h3>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <span class="label">Grid oppløsning</span>
+                        <span class="value">12 × 15</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Konvergenstoleranse</span>
+                        <span class="value">1e-06</span>
+                    </div>
+                    <div class="metric">
+                        <span class="label">Maks iterasjoner</span>
+                        <span class="value">500</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+            
+            
+    <section class="section">
+        <div class="section-header">
+            Sammendrag
+        </div>
+        <div class="section-content">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">60.0%</div>
+                    <div class="metric-label">Effektivitet</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">24.1 kW</div>
+                    <div class="metric-label">Varmeoverføring</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">1.50</div>
+                    <div class="metric-label">NTU</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">26.6°C</div>
+                    <div class="metric-label">Varm utløp</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+            
+            
+    <section class="section">
+        <div class="section-header">
+            Ytelsesparametre
+        </div>
+        <div class="section-content">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">24.12 kW</div>
+                    <div class="metric-label">Varmeoverføringsrate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.600</div>
+                    <div class="metric-label">Effektivitet</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">1.50</div>
+                    <div class="metric-label">NTU (Number of Transfer Units)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">42.5 Pa</div>
+                    <div class="metric-label">Trykkfall varm side</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">35.0 Pa</div>
+                    <div class="metric-label">Trykkfall kald side</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">20.0 W/m²·K</div>
+                    <div class="metric-label">Samlet varmeoverføringskoeffisient</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+            
+            
+    <section class="section">
+        <div class="section-header">
+            Luftstrømmer ved utløp
+        </div>
+        <div class="section-content">
+            <div class="stream-comparison">
+                <div class="stream-card hot">
+                    <div class="stream-header">
+                        <span class="temp-indicator hot"></span>
+                        Varm luftstrøm
+                    </div>
+                    <div class="property-grid">
+                        <div class="property">
+                            <span class="property-label">Temperatur:</span>
+                            <span class="property-value">26.6°C</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Relativ fuktighet:</span>
+                            <span class="property-value">72.0%</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Massestrøm:</span>
+                            <span class="property-value">2.50 kg/s</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Volumstrøm:</span>
+                            <span class="property-value">2.17 m³/s</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Entalpistrøm:</span>
+                            <span class="property-value">16.9 kW</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stream-card cold">
+                    <div class="stream-header">
+                        <span class="temp-indicator cold"></span>
+                        Kald luftstrøm
+                    </div>
+                    <div class="property-grid">
+                        <div class="property">
+                            <span class="property-label">Temperatur:</span>
+                            <span class="property-value">24.6°C</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Relativ fuktighet:</span>
+                            <span class="property-value">32.0%</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Massestrøm:</span>
+                            <span class="property-value">2.00 kg/s</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Volumstrøm:</span>
+                            <span class="property-value">1.69 m³/s</span>
+                        </div>
+                        <div class="property">
+                            <span class="property-label">Entalpistrøm:</span>
+                            <span class="property-value">7.2 kW</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+            
+            
+    <section class="section">
+        <div class="section-header">
+            Faseendringer
+        </div>
+        <div class="section-content">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="status-indicator status-success">
+                        ✓ Ingen kondensasjon
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="status-indicator status-success">
+                        ✓ Ingen rimdannelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+            
+            
+    <section class="section">
+        <div class="section-header">
+            Numerisk konvergens
+        </div>
+        <div class="section-content">
+            <div class="status-indicator status-success">
+                ✓ Konvergert
+            </div>
+            
+            <div class="convergence-details">
+                <div class="property-grid">
+                    <div class="property">
+                        <span class="property-label">Iterasjoner:</span>
+                        <span class="property-value">45</span>
+                    </div>
+                    <div class="property">
+                        <span class="property-label">Endelig residual:</span>
+                        <span class="property-value">1.50e-07</span>
+                    </div>
+                    <div class="property">
+                        <span class="property-label">Toleranse:</span>
+                        <span class="property-value">1.01e-06</span>
+                    </div>
+                    <div class="property">
+                        <span class="property-label">Beregningstid:</span>
+                        <span class="property-value">0.80 s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+            
+            
+    <section class="section">
+        <div class="section-header">
+            Temperaturfordeling
+        </div>
+        <div class="section-content">
+            <div class="plot-grid">
+                <div class="plot-card">
+                    <div class="plot-title">Plate temperaturer</div>
+                    <div class="plot-container">
+                        <canvas id="plateTemperatureChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="plot-card">
+                    <div class="plot-title">Varm luft temperaturer</div>
+                    <div class="plot-container">
+                        <canvas id="hotAirTemperatureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="plot-grid">
+                <div class="plot-card">
+                    <div class="plot-title">Kald luft temperaturer</div>
+                    <div class="plot-container">
+                        <canvas id="coldAirTemperatureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+        </main>
+    </div>
+
+    <script>
+        // Data for JavaScript plotting
+        const reportData = {
+  "input_data": {
+    "geometry": {
+      "width": 0.6,
+      "length": 1.2,
+      "plate_thickness": 0.001,
+      "channel_height": 0.008,
+      "num_plates": 20,
+      "plate_material": "glass_fiber_plastic"
+    },
+    "flow_directions": {
+      "hot_direction": "Direction.SOUTH",
+      "cold_direction": "Direction.NORTH"
+    },
+    "hot_stream": {
+      "moist_air": {
+        "temperature": 35.0,
+        "pressure": 101325.0,
+        "engine": null,
+        "relative_humidity": 60.0,
+        "humidity_ratio": null,
+        "dew_point": null,
+        "wet_bulb": null
+      },
+      "mass_flow": 2.5
+    },
+    "cold_stream": {
+      "moist_air": {
+        "temperature": 15.0,
+        "pressure": 101325.0,
+        "engine": null,
+        "relative_humidity": 40.0,
+        "humidity_ratio": null,
+        "dew_point": null,
+        "wet_bulb": null
+      },
+      "mass_flow": 2.0
+    },
+    "grid_resolution": [
+      12,
+      15
+    ],
+    "convergence_tolerance": 1.01e-06,
+    "max_iterations": 500
+  },
+  "performance": {
+    "effectiveness": 0.6,
+    "ntu": 1.5,
+    "heat_transfer_rate": 24.119999999999997,
+    "pressure_drop_hot": 42.5,
+    "pressure_drop_cold": 35.0,
+    "overall_heat_transfer_coefficient": 20.0
+  },
+  "hot_outlet": {
+    "moist_air": {
+      "temperature": 26.6,
+      "pressure": 101295.0,
+      "relative_humidity": 72.0,
+      "humidity_ratio": 0.012,
+      "dew_point": 21.6,
+      "wet_bulb": 23.6,
+      "density": 1.15,
+      "specific_volume": 0.87,
+      "enthalpy": 50.0
+    },
+    "mass_flow": 2.5,
+    "volume_flow": 2.173913043478261,
+    "enthalpy_flow": 16.883999999999997
+  },
+  "cold_outlet": {
+    "moist_air": {
+      "temperature": 24.6,
+      "pressure": 101300.0,
+      "relative_humidity": 32.0,
+      "humidity_ratio": 0.008,
+      "dew_point": 16.6,
+      "wet_bulb": 19.6,
+      "density": 1.18,
+      "specific_volume": 0.85,
+      "enthalpy": 35.0
+    },
+    "mass_flow": 2.0,
+    "volume_flow": 1.6949152542372883,
+    "enthalpy_flow": 7.235999999999999
+  },
+  "phase_changes": {
+    "condensation_rate": 0.0,
+    "frost_thickness": 0.0,
+    "condensation_occurred": false,
+    "frost_occurred": false
+  },
+  "grid_results": {
+    "grid_resolution": [
+      12,
+      15
+    ],
+    "plate_temperatures": [
+      [
+        24.1,
+        24.2,
+        24.4,
+        24.6,
+        24.7,
+        24.9,
+        25.1,
+        25.3,
+        25.4,
+        25.6,
+        25.8,
+        25.9
+      ],
+      [
+        24.1,
+        24.3,
+        24.4,
+        24.6,
+        24.8,
+        25.0,
+        25.1,
+        25.3,
+        25.5,
+        25.6,
+        25.8,
+        26.0
+      ],
+      [
+        24.1,
+        24.3,
+        24.5,
+        24.7,
+        24.8,
+        25.0,
+        25.2,
+        25.3,
+        25.5,
+        25.7,
+        25.9,
+        26.0
+      ],
+      [
+        24.2,
+        24.4,
+        24.5,
+        24.7,
+        24.9,
+        25.0,
+        25.2,
+        25.4,
+        25.6,
+        25.7,
+        25.9,
+        26.1
+      ],
+      [
+        24.2,
+        24.4,
+        24.6,
+        24.7,
+        24.9,
+        25.1,
+        25.3,
+        25.4,
+        25.6,
+        25.8,
+        25.9,
+        26.1
+      ],
+      [
+        24.3,
+        24.4,
+        24.6,
+        24.8,
+        25.0,
+        25.1,
+        25.3,
+        25.5,
+        25.6,
+        25.8,
+        26.0,
+        26.2
+      ],
+      [
+        24.3,
+        24.5,
+        24.7,
+        24.8,
+        25.0,
+        25.2,
+        25.3,
+        25.5,
+        25.7,
+        25.9,
+        26.0,
+        26.2
+      ],
+      [
+        24.3,
+        24.5,
+        24.7,
+        24.9,
+        25.0,
+        25.2,
+        25.4,
+        25.6,
+        25.7,
+        25.9,
+        26.1,
+        26.2
+      ],
+      [
+        24.4,
+        24.6,
+        24.7,
+        24.9,
+        25.1,
+        25.3,
+        25.4,
+        25.6,
+        25.8,
+        25.9,
+        26.1,
+        26.3
+      ],
+      [
+        24.4,
+        24.6,
+        24.8,
+        25.0,
+        25.1,
+        25.3,
+        25.5,
+        25.6,
+        25.8,
+        26.0,
+        26.2,
+        26.3
+      ],
+      [
+        24.5,
+        24.7,
+        24.8,
+        25.0,
+        25.2,
+        25.3,
+        25.5,
+        25.7,
+        25.9,
+        26.0,
+        26.2,
+        26.4
+      ],
+      [
+        24.5,
+        24.7,
+        24.9,
+        25.0,
+        25.2,
+        25.4,
+        25.6,
+        25.7,
+        25.9,
+        26.1,
+        26.2,
+        26.4
+      ],
+      [
+        24.6,
+        24.7,
+        24.9,
+        25.1,
+        25.3,
+        25.4,
+        25.6,
+        25.8,
+        25.9,
+        26.1,
+        26.3,
+        26.5
+      ],
+      [
+        24.6,
+        24.8,
+        25.0,
+        25.1,
+        25.3,
+        25.5,
+        25.6,
+        25.8,
+        26.0,
+        26.2,
+        26.3,
+        26.5
+      ],
+      [
+        24.7,
+        24.8,
+        25.0,
+        25.2,
+        25.3,
+        25.5,
+        25.7,
+        25.9,
+        26.0,
+        26.2,
+        26.4,
+        26.6
+      ]
+    ],
+    "hot_air_temperatures": [
+      [
+        33.5,
+        33.8,
+        34.0,
+        34.3,
+        34.6,
+        34.9,
+        35.1,
+        35.4,
+        35.7,
+        36.0,
+        36.2,
+        36.5
+      ],
+      [
+        32.9,
+        33.2,
+        33.4,
+        33.7,
+        34.0,
+        34.3,
+        34.5,
+        34.8,
+        35.1,
+        35.4,
+        35.6,
+        35.9
+      ],
+      [
+        32.3,
+        32.6,
+        32.8,
+        33.1,
+        33.4,
+        33.7,
+        33.9,
+        34.2,
+        34.5,
+        34.8,
+        35.0,
+        35.3
+      ],
+      [
+        31.7,
+        32.0,
+        32.2,
+        32.5,
+        32.8,
+        33.1,
+        33.3,
+        33.6,
+        33.9,
+        34.2,
+        34.4,
+        34.7
+      ],
+      [
+        31.1,
+        31.4,
+        31.6,
+        31.9,
+        32.2,
+        32.5,
+        32.7,
+        33.0,
+        33.3,
+        33.6,
+        33.8,
+        34.1
+      ],
+      [
+        30.5,
+        30.8,
+        31.0,
+        31.3,
+        31.6,
+        31.9,
+        32.1,
+        32.4,
+        32.7,
+        33.0,
+        33.2,
+        33.5
+      ],
+      [
+        29.9,
+        30.2,
+        30.4,
+        30.7,
+        31.0,
+        31.3,
+        31.5,
+        31.8,
+        32.1,
+        32.4,
+        32.6,
+        32.9
+      ],
+      [
+        29.3,
+        29.6,
+        29.8,
+        30.1,
+        30.4,
+        30.7,
+        30.9,
+        31.2,
+        31.5,
+        31.8,
+        32.0,
+        32.3
+      ],
+      [
+        28.7,
+        29.0,
+        29.2,
+        29.5,
+        29.8,
+        30.1,
+        30.3,
+        30.6,
+        30.9,
+        31.2,
+        31.4,
+        31.7
+      ],
+      [
+        28.1,
+        28.4,
+        28.6,
+        28.9,
+        29.2,
+        29.5,
+        29.7,
+        30.0,
+        30.3,
+        30.6,
+        30.8,
+        31.1
+      ],
+      [
+        27.5,
+        27.8,
+        28.0,
+        28.3,
+        28.6,
+        28.9,
+        29.1,
+        29.4,
+        29.7,
+        30.0,
+        30.2,
+        30.5
+      ],
+      [
+        26.9,
+        27.2,
+        27.4,
+        27.7,
+        28.0,
+        28.3,
+        28.5,
+        28.8,
+        29.1,
+        29.4,
+        29.6,
+        29.9
+      ],
+      [
+        26.3,
+        26.6,
+        26.8,
+        27.1,
+        27.4,
+        27.7,
+        27.9,
+        28.2,
+        28.5,
+        28.8,
+        29.0,
+        29.3
+      ],
+      [
+        25.7,
+        26.0,
+        26.2,
+        26.5,
+        26.8,
+        27.1,
+        27.3,
+        27.6,
+        27.9,
+        28.2,
+        28.4,
+        28.7
+      ],
+      [
+        25.1,
+        25.4,
+        25.6,
+        25.9,
+        26.2,
+        26.5,
+        26.7,
+        27.0,
+        27.3,
+        27.6,
+        27.8,
+        28.1
+      ]
+    ],
+    "cold_air_temperatures": [
+      [
+        16.2,
+        16.0,
+        15.8,
+        15.5,
+        15.3,
+        15.1,
+        14.9,
+        14.7,
+        14.5,
+        14.2,
+        14.0,
+        13.8
+      ],
+      [
+        16.9,
+        16.7,
+        16.4,
+        16.2,
+        16.0,
+        15.8,
+        15.6,
+        15.4,
+        15.1,
+        14.9,
+        14.7,
+        14.5
+      ],
+      [
+        17.6,
+        17.4,
+        17.1,
+        16.9,
+        16.7,
+        16.5,
+        16.3,
+        16.0,
+        15.8,
+        15.6,
+        15.4,
+        15.2
+      ],
+      [
+        18.3,
+        18.0,
+        17.8,
+        17.6,
+        17.4,
+        17.2,
+        16.9,
+        16.7,
+        16.5,
+        16.3,
+        16.1,
+        15.9
+      ],
+      [
+        18.9,
+        18.7,
+        18.5,
+        18.3,
+        18.1,
+        17.9,
+        17.6,
+        17.4,
+        17.2,
+        17.0,
+        16.8,
+        16.5
+      ],
+      [
+        19.6,
+        19.4,
+        19.2,
+        19.0,
+        18.8,
+        18.5,
+        18.3,
+        18.1,
+        17.9,
+        17.7,
+        17.4,
+        17.2
+      ],
+      [
+        20.3,
+        20.1,
+        19.9,
+        19.7,
+        19.4,
+        19.2,
+        19.0,
+        18.8,
+        18.6,
+        18.4,
+        18.1,
+        17.9
+      ],
+      [
+        21.0,
+        20.8,
+        20.6,
+        20.3,
+        20.1,
+        19.9,
+        19.7,
+        19.5,
+        19.3,
+        19.0,
+        18.8,
+        18.6
+      ],
+      [
+        21.7,
+        21.5,
+        21.2,
+        21.0,
+        20.8,
+        20.6,
+        20.4,
+        20.2,
+        19.9,
+        19.7,
+        19.5,
+        19.3
+      ],
+      [
+        22.4,
+        22.2,
+        21.9,
+        21.7,
+        21.5,
+        21.3,
+        21.1,
+        20.8,
+        20.6,
+        20.4,
+        20.2,
+        20.0
+      ],
+      [
+        23.1,
+        22.8,
+        22.6,
+        22.4,
+        22.2,
+        22.0,
+        21.7,
+        21.5,
+        21.3,
+        21.1,
+        20.9,
+        20.7
+      ],
+      [
+        23.7,
+        23.5,
+        23.3,
+        23.1,
+        22.9,
+        22.7,
+        22.4,
+        22.2,
+        22.0,
+        21.8,
+        21.6,
+        21.3
+      ],
+      [
+        24.4,
+        24.2,
+        24.0,
+        23.8,
+        23.6,
+        23.3,
+        23.1,
+        22.9,
+        22.7,
+        22.5,
+        22.2,
+        22.0
+      ],
+      [
+        25.1,
+        24.9,
+        24.7,
+        24.5,
+        24.2,
+        24.0,
+        23.8,
+        23.6,
+        23.4,
+        23.2,
+        22.9,
+        22.7
+      ],
+      [
+        25.8,
+        25.6,
+        25.4,
+        25.1,
+        24.9,
+        24.7,
+        24.5,
+        24.3,
+        24.1,
+        23.8,
+        23.6,
+        23.4
+      ]
+    ],
+    "max_plate_temperature": 26.6,
+    "min_plate_temperature": 24.1,
+    "temperature_uniformity": 0.15
+  },
+  "convergence": {
+    "converged": true,
+    "iterations": 45,
+    "final_residual": 1.5e-07,
+    "convergence_tolerance": 1.01e-06,
+    "computation_time": 0.8
+  },
+  "analysis_timestamp": "2025-09-28T14:56:46.694146",
+  "solver_version": "HXKit Simulator v1.0"
+};
+        
+        
+        // Heatmap farger (viridis-inspirert)
+        function getTemperatureColor(temp, minTemp, maxTemp) {
+            const normalized = (temp - minTemp) / (maxTemp - minTemp);
+            const colors = [
+                [68, 1, 84],    // Mørk lilla
+                [59, 82, 139],  // Blå
+                [33, 145, 140], // Cyan
+                [94, 201, 98],  // Grønn
+                [253, 231, 37]  // Gul
+            ];
+            
+            const scaledIndex = normalized * (colors.length - 1);
+            const lowerIndex = Math.floor(scaledIndex);
+            const upperIndex = Math.ceil(scaledIndex);
+            const fraction = scaledIndex - lowerIndex;
+            
+            if (lowerIndex === upperIndex) {
+                const [r, g, b] = colors[lowerIndex];
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+            
+            const [r1, g1, b1] = colors[lowerIndex];
+            const [r2, g2, b2] = colors[upperIndex];
+            
+            const r = Math.round(r1 + (r2 - r1) * fraction);
+            const g = Math.round(g1 + (g2 - g1) * fraction);
+            const b = Math.round(b1 + (b2 - b1) * fraction);
+            
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Konverter 2D temperaturdata til heatmap dataset
+        function createHeatmapData(temperatureArray, label) {
+            if (!temperatureArray || !temperatureArray.length) {
+                return { datasets: [] };
+            }
+            
+            const allTemps = temperatureArray.flat();
+            const minTemp = Math.min(...allTemps);
+            const maxTemp = Math.max(...allTemps);
+            
+            const data = [];
+            for (let y = 0; y < temperatureArray.length; y++) {
+                for (let x = 0; x < temperatureArray[y].length; x++) {
+                    const temp = temperatureArray[y][x];
+                    data.push({
+                        x: x,
+                        y: y,
+                        v: temp,
+                        backgroundColor: getTemperatureColor(temp, minTemp, maxTemp)
+                    });
+                }
+            }
+            
+            return {
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: function(context) {
+                        return context.parsed.raw.backgroundColor;
+                    },
+                    borderWidth: 1,
+                    borderColor: 'rgba(255, 255, 255, 0.3)'
+                }]
+            };
+        }
+
+        // Opprett heatmap med Canvas 2D API
+        function createHeatmapChart(canvasId, temperatureData, title) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || !temperatureData || !temperatureData.length) {
+                console.warn(`Ingen data tilgjengelig for ${canvasId}`);
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            const containerWidth = canvas.parentElement.clientWidth;
+            const containerHeight = 350;
+            
+            canvas.width = containerWidth;
+            canvas.height = containerHeight;
+            canvas.style.width = containerWidth + 'px';
+            canvas.style.height = containerHeight + 'px';
+            
+            const width = temperatureData[0].length;
+            const height = temperatureData.length;
+            
+            // Beregn temperaturområde
+            const allTemps = temperatureData.flat();
+            const minTemp = Math.min(...allTemps);
+            const maxTemp = Math.max(...allTemps);
+            
+            // Beregn celle størrelser
+            const cellWidth = (containerWidth - 100) / width;  // Legg til plass for akser
+            const cellHeight = (containerHeight - 100) / height;
+            
+            const offsetX = 60;
+            const offsetY = 20;
+            
+            // Tegn tittel
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, containerWidth / 2, 20);
+            
+            // Tegn heatmap celler
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const temp = temperatureData[y][x];
+                    const color = getTemperatureColor(temp, minTemp, maxTemp);
+                    
+                    ctx.fillStyle = color;
+                    ctx.fillRect(
+                        offsetX + x * cellWidth,
+                        offsetY + 30 + y * cellHeight,
+                        cellWidth,
+                        cellHeight
+                    );
+                    
+                    // Tegn temperaturverdi hvis cellene er store nok
+                    if (cellWidth > 30 && cellHeight > 20) {
+                        ctx.fillStyle = temp > (minTemp + maxTemp) / 2 ? 'white' : 'black';
+                        ctx.font = '10px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(
+                            temp.toFixed(1),
+                            offsetX + x * cellWidth + cellWidth / 2,
+                            offsetY + 30 + y * cellHeight + cellHeight / 2 + 3
+                        );
+                    }
+                }
+            }
+            
+            // Tegn fargeskala
+            drawColorScale(ctx, containerWidth - 50, offsetY + 30, 20, height * cellHeight, minTemp, maxTemp);
+            
+            // Tegn akser
+            ctx.fillStyle = '#666';
+            ctx.font = '12px Arial';
+            
+            // X-akse
+            for (let x = 0; x <= width; x += Math.max(1, Math.floor(width / 10))) {
+                ctx.textAlign = 'center';
+                ctx.fillText(
+                    x.toString(),
+                    offsetX + x * cellWidth,
+                    offsetY + 30 + height * cellHeight + 20
+                );
+            }
+            
+            // Y-akse
+            for (let y = 0; y <= height; y += Math.max(1, Math.floor(height / 10))) {
+                ctx.textAlign = 'right';
+                ctx.fillText(
+                    y.toString(),
+                    offsetX - 10,
+                    offsetY + 30 + y * cellHeight + 4
+                );
+            }
+            
+            // Akselabels
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Bredde posisjon', containerWidth / 2, containerHeight - 5);
+            
+            ctx.save();
+            ctx.translate(15, containerHeight / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Lengde posisjon', 0, 0);
+            ctx.restore();
+        }
+        
+        // Tegn fargeskala
+        function drawColorScale(ctx, x, y, width, height, minTemp, maxTemp) {
+            const steps = 100;
+            const stepHeight = height / steps;
+            
+            for (let i = 0; i < steps; i++) {
+                const temp = minTemp + (maxTemp - minTemp) * (1 - i / steps);
+                const color = getTemperatureColor(temp, minTemp, maxTemp);
+                
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y + i * stepHeight, width, stepHeight);
+            }
+            
+            // Fargeskala ramme
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, width, height);
+            
+            // Fargeskala labels
+            ctx.fillStyle = '#333';
+            ctx.font = '10px Arial';
+            ctx.textAlign = 'left';
+            
+            const labelSteps = 5;
+            for (let i = 0; i <= labelSteps; i++) {
+                const temp = minTemp + (maxTemp - minTemp) * (1 - i / labelSteps);
+                const labelY = y + (i / labelSteps) * height;
+                
+                ctx.fillText(
+                    temp.toFixed(1) + '°C',
+                    x + width + 5,
+                    labelY + 3
+                );
+            }
+        }
+
+
+
+        // Legg til tooltip interaktivitet for heatmaps
+        function addHeatmapTooltip(canvasId, temperatureData) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || !temperatureData || !temperatureData.length) return;
+            
+            const tooltip = document.createElement('div');
+            tooltip.style.cssText = `
+                position: absolute;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 1000;
+                display: none;
+            `;
+            document.body.appendChild(tooltip);
+            
+            const width = temperatureData[0].length;
+            const height = temperatureData.length;
+            const containerWidth = canvas.clientWidth;
+            const containerHeight = 350;
+            
+            const cellWidth = (containerWidth - 100) / width;
+            const cellHeight = (containerHeight - 100) / height;
+            const offsetX = 60;
+            const offsetY = 50;
+            
+            canvas.addEventListener('mousemove', function(event) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                const mouseY = event.clientY - rect.top;
+                
+                const gridX = Math.floor((mouseX - offsetX) / cellWidth);
+                const gridY = Math.floor((mouseY - offsetY) / cellHeight);
+                
+                if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
+                    const temp = temperatureData[gridY][gridX];
+                    tooltip.innerHTML = `Posisjon (${gridX}, ${gridY})<br>Temperatur: ${temp.toFixed(1)}°C`;
+                    tooltip.style.left = event.clientX + 10 + 'px';
+                    tooltip.style.top = event.clientY - 30 + 'px';
+                    tooltip.style.display = 'block';
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+            
+            canvas.addEventListener('mouseleave', function() {
+                tooltip.style.display = 'none';
+            });
+        }
+
+        // Initialiser alle plott når siden er lastet
+        document.addEventListener('DOMContentLoaded', function() {
+            if (reportData.grid_results) {
+                const gridResults = reportData.grid_results;
+                
+                createHeatmapChart(
+                    'plateTemperatureChart',
+                    gridResults.plate_temperatures,
+                    'Plate temperaturer (°C)'
+                );
+                addHeatmapTooltip('plateTemperatureChart', gridResults.plate_temperatures);
+                
+                createHeatmapChart(
+                    'hotAirTemperatureChart',
+                    gridResults.hot_air_temperatures,
+                    'Varm luft temperaturer (°C)'
+                );
+                addHeatmapTooltip('hotAirTemperatureChart', gridResults.hot_air_temperatures);
+                
+                createHeatmapChart(
+                    'coldAirTemperatureChart',
+                    gridResults.cold_air_temperatures,
+                    'Kald luft temperaturer (°C)'
+                );
+                addHeatmapTooltip('coldAirTemperatureChart', gridResults.cold_air_temperatures);
+                
+
+            } else {
+                // Vis meldinger hvis grid data ikke er tilgjengelig
+                const charts = ['plateTemperatureChart', 'hotAirTemperatureChart', 'coldAirTemperatureChart'];
+                charts.forEach(chartId => {
+                    const canvas = document.getElementById(chartId);
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        ctx.font = '16px Arial';
+                        ctx.fillStyle = '#666';
+                        ctx.textAlign = 'center';
+                        canvas.width = canvas.parentElement.clientWidth;
+                        canvas.height = 300;
+                        ctx.fillText('Grid resultater ikke tilgjengelig i denne analysen', canvas.width/2, canvas.height/2);
+                    }
+                });
+            }
+        });
+    
+    </script>
+</body>
+</html>

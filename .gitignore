@@ -1,3 +1,8 @@
+--- IGNORE ---
+
+# Spesielle filer og kataloger som skal ignoreres av Git
+rapport_output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

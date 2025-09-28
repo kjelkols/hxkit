@@ -142,6 +142,7 @@ def main():
             dew_point=hot_air.dew_point,
             wet_bulb=hot_air.wet_bulb,
             density=hot_air.density,
+            specific_volume=hot_air.specific_volume,
             enthalpy=hot_air.enthalpy
         )
         
@@ -153,6 +154,7 @@ def main():
             dew_point=cold_air.dew_point,
             wet_bulb=cold_air.wet_bulb,
             density=cold_air.density,
+            specific_volume=cold_air.specific_volume,
             enthalpy=cold_air.enthalpy
         )
         
@@ -164,6 +166,7 @@ def main():
             dew_point=results["hot_outlet"].dew_point,
             wet_bulb=results["hot_outlet"].wet_bulb,
             density=results["hot_outlet"].density,
+            specific_volume=results["hot_outlet"].specific_volume,
             enthalpy=results["hot_outlet"].enthalpy
         )
         
@@ -175,6 +178,7 @@ def main():
             dew_point=results["cold_outlet"].dew_point,
             wet_bulb=results["cold_outlet"].wet_bulb,
             density=results["cold_outlet"].density,
+            specific_volume=results["cold_outlet"].specific_volume,
             enthalpy=results["cold_outlet"].enthalpy
         )
         

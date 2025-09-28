@@ -41,18 +41,14 @@ def main():
             "hot_mass_flow": 0.1,
             "cold_mass_flow": 0.1
         },
-        "geometry": {
-            "n_plates": 21,
-            "plate_geometry": {
-                "length": 0.6,
-                "width": 0.2,
-                "thickness": 0.0005,
-                "channel_height": 0.004,
-                "corrugation_angle": 60,
-                "area_enhancement": 1.2
+        "core": {
+            "geometry": {
+                "plate_width": 0.6,
+                "plate_height": 0.2,
+                "plate_spacing": 0.004,
+                "chevron_angle": 60
             },
-            "hot_channels": 10,
-            "cold_channels": 10
+            "num_plates": 21
         }
     }
     
@@ -63,7 +59,7 @@ def main():
         print("   ✓ Input data validert OK")
         print(f"   Varm innløp: {analysis_input.conditions.hot_side.temperature}°C")
         print(f"   Kald innløp: {analysis_input.conditions.cold_side.temperature}°C")
-        print(f"   Antall plater: {analysis_input.geometry.n_plates}")
+        print(f"   Antall plater: {analysis_input.core.num_plates}")
     except Exception as e:
         print(f"   ✗ Valideringsfeil: {e}")
         return
@@ -71,27 +67,14 @@ def main():
     # 3. Konverter til kjerneobjekter og utfør analyse
     print("\n3. Utfører analyse med adaptere...")
     try:
-        results = AnalysisAdapter.analyze_from_schema(analysis_input)
+        output_schema = AnalysisAdapter.analyze_from_schema(analysis_input)
         print("   ✓ Analyse fullført")
-        print(f"   Varmeoverføring: {results['heat_transfer_rate']/1000:.2f} kW")
-        print(f"   Effectiveness: {results['effectiveness']:.3f}")
-    except Exception as e:
-        print(f"   ✗ Analysefeil: {e}")
-        return
-    
-    # 4. Konverter resultater til Pydantic schema
-    print("\n4. Konverterer resultater til strukturert output...")
-    try:
-        # Legg til manglende felter for adapter
-        results["hot_inlet_temp"] = analysis_input.conditions.hot_side.temperature
-        results["cold_inlet_temp"] = analysis_input.conditions.cold_side.temperature
-        
-        output_schema = AnalysisAdapter.results_to_schema(results)
-        print("   ✓ Output schema opprettet")
+        print(f"   Varmeoverføring: {output_schema.heat_transfer_rate/1000:.2f} kW")
+        print(f"   Effectiveness: {output_schema.effectiveness:.3f}")
         print(f"   Varm utløp: {output_schema.hot_outlet.temperature:.1f}°C")
         print(f"   Kald utløp: {output_schema.cold_outlet.temperature:.1f}°C")
     except Exception as e:
-        print(f"   ✗ Output konverteringsfeil: {e}")
+        print(f"   ✗ Analysefeil: {e}")
         return
     
     # 5. Serialiser til JSON
@@ -109,7 +92,7 @@ def main():
         print("\n   Input JSON (utdrag):")
         input_dict = json.loads(input_json)
         print(f"     Temperature hot: {input_dict['conditions']['hot_side']['temperature']}°C")
-        print(f"     Plates: {input_dict['geometry']['n_plates']}")
+        print(f"     Plates: {input_dict['core']['num_plates']}")
         
         print("\n   Output JSON (utdrag):")
         output_dict = json.loads(output_json)

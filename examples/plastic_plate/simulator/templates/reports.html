@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simuleringsrapporter - Plastic Plate Heat Exchanger</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .nav-links {
+            margin-bottom: 30px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-right: 15px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background: #2980b9;
+        }
+
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .reports-table th {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .reports-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .reports-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .report-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .report-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .no-reports {
+            text-align: center;
+            padding: 60px;
+            color: #7f8c8d;
+        }
+
+        .no-reports h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .file-size {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .created-date {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Simuleringsrapporter</h1>
+            <p>Oversikt over genererte rapporter fra Plastic Plate Heat Exchanger Simulator</p>
+        </div>
+
+        <div class="content">
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-link">🏠 Tilbake til simulator</a>
+            </div>
+
+            {% if reports %}
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>📋 Rapport</th>
+                            <th>📅 Opprettet</th>
+                            <th>💾 Størrelse</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_report', filename=report.filename) }}" class="report-link">
+                                    {{ report.filename }}
+                                </a>
+                            </td>
+                            <td class="created-date">{{ report.created }}</td>
+                            <td class="file-size">{{ report.size }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-reports">
+                    <h3>🔍 Ingen rapporter funnet</h3>
+                    <p>Kjør en simulering først for å generere rapporter.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

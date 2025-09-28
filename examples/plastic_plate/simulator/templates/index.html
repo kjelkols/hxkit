@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plastic Plate Heat Exchanger Simulator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 4px solid #3498db;
+        }
+
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h3::before {
+            content: "⚙️";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .section.geometry h3::before { content: "📐"; }
+        .section.streams h3::before { content: "🌡️"; }
+        .section.flow h3::before { content: "➡️"; }
+        .section.numerical h3::before { content: "🔢"; }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .unit {
+            font-size: 0.9em;
+            color: #666;
+            margin-left: 5px;
+        }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .reports-link {
+            display: inline-block;
+            margin-left: 20px;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .reports-link:hover {
+            color: #2c3e50;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h4 {
+            margin-bottom: 10px;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 8px 16px;
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: #d5dbdb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Plastic Plate Heat Exchanger Simulator</h1>
+            <p>Interaktiv simulator for analyse av plastic plate varmeveksler</p>
+        </div>
+
+        <div class="form-container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-error">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="info-box">
+                <h4>🚀 Hvordan bruke simulatoren:</h4>
+                <p>Fyll ut parametrene nedenfor og klikk "Kjør Simulering" for å generere en detaljert HTML-rapport med resultater og 2D temperaturplott.</p>
+            </div>
+
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="loadPreset('standard')">📋 Standard konfiguration</button>
+                <button class="preset-btn" onclick="loadPreset('hightemp')">🔥 Høy temperatur</button>
+                <button class="preset-btn" onclick="loadPreset('lowtemp')">❄️ Lav temperatur</button>
+            </div>
+
+            <form method="POST" action="{{ url_for('simulate') }}">
+                <div class="form-grid">
+                    <!-- Geometri -->
+                    <div class="section geometry">
+                        <h3>Geometri</h3>
+                        
+                        <div class="form-group">
+                            <label for="width">Platebredde <span class="unit">[m]</span></label>
+                            <input type="number" id="width" name="width" value="0.6" step="0.01" min="0.1" max="5.0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="length">Platelengde <span class="unit">[m]</span></label>
+                            <input type="number" id="length" name="length" value="1.2" step="0.01" min="0.1" max="10.0" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="plate_thickness">Platetykkelse <span class="unit">[m]</span></label>
+                                <input type="number" id="plate_thickness" name="plate_thickness" value="0.001" step="0.0001" min="0.0001" max="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="channel_height">Kanalhøyde <span class="unit">[m]</span></label>
+                                <input type="number" id="channel_height" name="channel_height" value="0.008" step="0.0001" min="0.001" max="0.5" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="num_plates">Antall plater</label>
+                                <input type="number" id="num_plates" name="num_plates" value="20" min="1" max="1000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="plate_material">Platemateriale</label>
+                                <select id="plate_material" name="plate_material" required>
+                                    <option value="glass_fiber_plastic">Glass Fiber Plastic</option>
+                                    <option value="polypropylene">Polypropylene</option>
+                                    <option value="polyethylene">Polyethylene</option>
+                                    <option value="abs_plastic">ABS Plastic</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strømningsretninger -->
+                    <div class="section flow">
+                        <h3>Strømningsretninger</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hot_direction">Varm luft retning</label>
+                                <select id="hot_direction" name="hot_direction" required>
+                                    <option value="north">Nord (N)</option>
+                                    <option value="south" selected>Sør (S)</option>
+                                    <option value="east">Øst (E)</option>
+                                    <option value="west">Vest (W)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="cold_direction">Kald luft retning</label>
+                                <select id="cold_direction" name="cold_direction" required>
+                                    <option value="north" selected>Nord (N)</option>
+                                    <option value="south">Sør (S)</option>
+                                    <option value="east">Øst (E)</option>
+                                    <option value="west">Vest (W)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Varm strøm -->
+                    <div class="section streams">
+                        <h3>Varm Luftstrøm (Innløp)</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hot_temperature">Temperatur <span class="unit">[°C]</span></label>
+                                <input type="number" id="hot_temperature" name="hot_temperature" value="35.0" step="0.1" min="-50" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hot_pressure">Trykk <span class="unit">[Pa]</span></label>
+                                <input type="number" id="hot_pressure" name="hot_pressure" value="101325" min="50000" max="200000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hot_humidity">Relativ fuktighet <span class="unit">[%]</span></label>
+                                <input type="number" id="hot_humidity" name="hot_humidity" value="60.0" step="0.1" min="0" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hot_mass_flow">Massestrøm <span class="unit">[kg/s]</span></label>
+                                <input type="number" id="hot_mass_flow" name="hot_mass_flow" value="2.5" step="0.1" min="0.1" max="1000" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kald strøm -->
+                    <div class="section streams">
+                        <h3>Kald Luftstrøm (Innløp)</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cold_temperature">Temperatur <span class="unit">[°C]</span></label>
+                                <input type="number" id="cold_temperature" name="cold_temperature" value="15.0" step="0.1" min="-50" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cold_pressure">Trykk <span class="unit">[Pa]</span></label>
+                                <input type="number" id="cold_pressure" name="cold_pressure" value="101325" min="50000" max="200000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cold_humidity">Relativ fuktighet <span class="unit">[%]</span></label>
+                                <input type="number" id="cold_humidity" name="cold_humidity" value="40.0" step="0.1" min="0" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cold_mass_flow">Massestrøm <span class="unit">[kg/s]</span></label>
+                                <input type="number" id="cold_mass_flow" name="cold_mass_flow" value="2.0" step="0.1" min="0.1" max="1000" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Numeriske parametere -->
+                    <div class="section numerical">
+                        <h3>Numeriske Parametere</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="grid_width">Grid bredde celler</label>
+                                <input type="number" id="grid_width" name="grid_width" value="12" min="2" max="50" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="grid_length">Grid lengde celler</label>
+                                <input type="number" id="grid_length" name="grid_length" value="15" min="2" max="50" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="convergence_tolerance">Konvergenstoleranse</label>
+                                <input type="number" id="convergence_tolerance" name="convergence_tolerance" value="1e-6" step="1e-7" min="1e-8" max="1e-3" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="max_iterations">Maks iterasjoner</label>
+                                <input type="number" id="max_iterations" name="max_iterations" value="500" min="10" max="5000" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit" class="submit-btn">🚀 Kjør Simulering</button>
+                    <a href="{{ url_for('list_reports') }}" class="reports-link">📊 Se tidligere rapporter</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Preset configurations
+        const presets = {
+            standard: {
+                width: 0.6,
+                length: 1.2,
+                plate_thickness: 0.001,
+                channel_height: 0.008,
+                num_plates: 20,
+                plate_material: 'glass_fiber_plastic',
+                hot_direction: 'south',
+                cold_direction: 'north',
+                hot_temperature: 35.0,
+                hot_pressure: 101325,
+                hot_humidity: 60.0,
+                hot_mass_flow: 2.5,
+                cold_temperature: 15.0,
+                cold_pressure: 101325,
+                cold_humidity: 40.0,
+                cold_mass_flow: 2.0,
+                grid_width: 12,
+                grid_length: 15,
+                convergence_tolerance: 1e-6,
+                max_iterations: 500
+            },
+            hightemp: {
+                width: 0.8,
+                length: 1.5,
+                plate_thickness: 0.0015,
+                channel_height: 0.010,
+                num_plates: 25,
+                plate_material: 'abs_plastic',
+                hot_direction: 'east',
+                cold_direction: 'west',
+                hot_temperature: 60.0,
+                hot_pressure: 101325,
+                hot_humidity: 80.0,
+                hot_mass_flow: 3.0,
+                cold_temperature: 5.0,
+                cold_pressure: 101325,
+                cold_humidity: 30.0,
+                cold_mass_flow: 2.5,
+                grid_width: 15,
+                grid_length: 20,
+                convergence_tolerance: 5e-7,
+                max_iterations: 750
+            },
+            lowtemp: {
+                width: 0.5,
+                length: 1.0,
+                plate_thickness: 0.0008,
+                channel_height: 0.006,
+                num_plates: 15,
+                plate_material: 'polyethylene',
+                hot_direction: 'north',
+                cold_direction: 'south',
+                hot_temperature: 25.0,
+                hot_pressure: 101325,
+                hot_humidity: 50.0,
+                hot_mass_flow: 1.5,
+                cold_temperature: 10.0,
+                cold_pressure: 101325,
+                cold_humidity: 60.0,
+                cold_mass_flow: 1.2,
+                grid_width: 10,
+                grid_length: 12,
+                convergence_tolerance: 1e-6,
+                max_iterations: 400
+            }
+        };
+
+        function loadPreset(presetName) {
+            const preset = presets[presetName];
+            if (!preset) return;
+
+            // Load all form fields
+            Object.keys(preset).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = preset[key];
+                }
+            });
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const hotTemp = parseFloat(document.getElementById('hot_temperature').value);
+            const coldTemp = parseFloat(document.getElementById('cold_temperature').value);
+
+            if (hotTemp <= coldTemp) {
+                e.preventDefault();
+                alert('Varm temperatur må være høyere enn kald temperatur!');
+                return false;
+            }
+
+            // Show loading message
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.innerHTML = '⏳ Kjører simulering...';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
